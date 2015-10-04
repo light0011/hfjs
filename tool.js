@@ -191,6 +191,15 @@ function getStyle(element,attr){
     }
 }
 
+//跨浏览器获取滚动条位置
+
+
+function getScroll(){
+    return {
+        top : document.documentElement.scrollTop || document.body.scrollTop,
+        left : document.documentElement.scrollLeft || document.body.scrollLeft
+    }
+}
 
 
 
