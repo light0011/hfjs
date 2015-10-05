@@ -59,23 +59,6 @@ $(function () {
         });
     });
     
-    //test
-    $('#test').click(function () {
-        $(this).animate({
-            t : 30,
-            step : 10,
-            attr : 'x',
-            target : 300,
-            //mul参数是一个对象，只有两种值：属性 ：目标值
-            mul : {
-                w : 101,            //长变300
-                h : 300,            //高变300
-                o : 30
-            }
-
-        });
-    });
-    
     
     //拖拽
     login.drag($('#login h2').last());
@@ -103,6 +86,56 @@ $(function () {
             target : -211
         });
     });
+    
+    //滑动导航
+    $('#nav .about li').hover(function () {
+        var target = $(this).first().offsetLeft;
+        $('#nav .nav_bg').animate({
+            attr : 'x',
+            target : target + 20,
+            t : 30,
+            step : 10,
+            fn : function () {
+                $('#nav .white').animate({
+                    attr : 'x',
+                    target : -target
+                });
+            }
+        });
+    }, function () {
+        $('#nav .nav_bg').animate({
+            attr : 'x',
+            target : 20,
+            t : 30,
+            step : 10,
+            fn : function () {
+                $('#nav .white').animate({
+                    attr : 'x',
+                    target : 0
+                });
+            }
+        });
+    });
+    
+    //左侧菜单
+    $('#sidebar h2').toggle(function () {
+        $(this).next().animate({
+            mul : {
+                h : 0,
+                o : 0
+            }
+        });
+    }, function () {
+        $(this).next().animate({
+            mul : {
+                h : 150,
+                o : 100
+            }
+        });
+    });
+
+    
+    
 });
 
 

@@ -56,11 +56,59 @@ $(function () {
             }
         });
     });
+
+    //滑动导航
+    $('#nav .about li').hover(function () {
+        var target = $(this).first().offsetLeft;
+        $('#nav .nav_bg').animate({
+            attr : 'x',
+            target : target + 20,
+            t : 30,
+            step : 10,
+            fn : function () {
+                $('#nav .white').animate({
+                    attr : 'x',
+                    target : -target
+                });
+            }
+        });
+    }, function () {
+        $('#nav .nav_bg').animate({
+            attr : 'x',
+            target : 20,
+            t : 30,
+            step : 10,
+            fn : function () {
+                $('#nav .white').animate({
+                    attr : 'x',
+                    target : 0
+                });
+            }
+        });
+    });
     
   
     //拖拽
     login.drag($('#login h2').last());
 
+
+    //左侧菜单
+  
+    $('#sidebar h2').toggle(function () {
+        $(this).next().animate({
+            mul : {
+                h : 0,
+                o : 0
+            }
+        });
+    }, function () {
+        $(this).next().animate({
+            mul : {
+                h : 150,
+                o : 100
+            }
+        });
+    });
 
 
 
@@ -87,6 +135,15 @@ $(function () {
             target : -211
         });
     });
+
+
+
+
+
+
+
+
+
 });
 
 

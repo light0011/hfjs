@@ -458,6 +458,45 @@ Base.prototype.animate = function(obj){
     return this;
 }
 
+//设置点击切换方法
+Base.prototype.toggle = function(){
+
+    for (var i = 0; i < this.elements.length; i++) {
+        (function(element,args){
+            console.log(args);
+            var count = 0;
+            addEvent(element,'click',function(){
+                args[count % args.length].call(this);
+                count++;
+            });
+        })(this.elements[i],arguments);
+
+    };
+
+    return this;
+}
+
+
+//获取当前节点的下一个元素节点
+Base.prototype.next = function(){
+    for (var i = 0; i < this.elements.length; i++) {
+        this.elements[i] = this.elements[i].nextSibling;
+        if (this.elements[i] == null) throw new Error('找不到下一个同级元素节点！');
+        if (this.elements[i].nodeType == 3) this.next();
+    };
+    return this;
+}
+
+
+//获取当前节点的下一个元素节点
+Base.prototype.prev = function(){
+    for (var i = 0; i < this.elements.length; i++) {
+        this.elements[i] = this.elements[i].previousSibling;
+        if (this.elements[i] == null) throw new Error('找不到下一个同级元素节点！');
+        if (this.elements[i].nodeType == 3) this.prev();
+    };
+    return this;
+}
 
 
 

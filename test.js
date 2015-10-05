@@ -158,7 +158,27 @@ Base.prototype.eq = function (num) {
     this.elements = [];
     this.elements[0] = element;
     return this;
-}
+};
+
+//获取当前节点的下一个元素节点
+Base.prototype.next = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i] = this.elements[i].nextSibling;
+        if (this.elements[i] == null) throw new Error('找不到下一个同级元素节点！');
+        if (this.elements[i].nodeType == 3) this.next();
+    }
+    return this;
+};
+
+//获取当前节点的上一个元素节点
+Base.prototype.prev = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i] = this.elements[i].previousSibling;
+        if (this.elements[i] == null) throw new Error('找不到上一个同级元素节点！');
+        if (this.elements[i].nodeType == 3) this.prev();
+    }
+    return this;
+};
 
 //设置CSS
 Base.prototype.css = function (attr, value) {
@@ -225,13 +245,26 @@ Base.prototype.hover = function (over, out) {
     return this;
 };
 
+//设置点击切换方法
+Base.prototype.toggle = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        (function (element, args) {
+            var count = 0;
+            addEvent(element, 'click', function () {
+                args[count++ % args.length].call(this);
+            });
+        })(this.elements[i], arguments);
+    }
+    return this;
+};
+
 //设置显示
 Base.prototype.show = function () {
     for (var i = 0; i < this.elements.length; i ++) {
         this.elements[i].style.display = 'block';
     }
     return this;
-}
+};
 
 //设置隐藏
 Base.prototype.hide = function () {
@@ -239,7 +272,7 @@ Base.prototype.hide = function () {
         this.elements[i].style.display = 'none';
     }
     return this;
-}
+};
 
 //设置物体居中
 Base.prototype.center = function (width, height) {
@@ -250,7 +283,7 @@ Base.prototype.center = function (width, height) {
         this.elements[i].style.left = left + 'px';
     }
     return this;
-}
+};
 
 //锁屏功能
 Base.prototype.lock = function () {
@@ -271,7 +304,7 @@ Base.prototype.unlock = function () {
         removeEvent(window, 'scroll', scrollTop);
     }
     return this;
-}
+};
 
 //触发点击事件
 Base.prototype.click = function (fn) {
@@ -279,7 +312,7 @@ Base.prototype.click = function (fn) {
         this.elements[i].onclick = fn;
     }
     return this;
-}
+};
 
 //触发浏览器窗口事件
 Base.prototype.resize = function (fn) {
@@ -296,7 +329,7 @@ Base.prototype.resize = function (fn) {
         });
     }
     return this;
-}
+};
 
 //设置动画
 Base.prototype.animate = function (obj) {
@@ -336,16 +369,16 @@ Base.prototype.animate = function (obj) {
             element.style.opacity = parseInt(start) / 100;
             element.style.filter = 'alpha(opacity=' + parseInt(start) +')';
         } else {
-            element.style[attr] = start + 'px';
+            //element.style[attr] = start + 'px';
         }
         
         
         if (mul == undefined) {
             mul = {};
             mul[attr] = target;
-        }
+        } 
         
-        
+
         clearInterval(element.timer);
         element.timer = setInterval(function () {
         
@@ -360,13 +393,15 @@ Base.prototype.animate = function (obj) {
             //创建一个布尔值，这个值可以了解多个动画是否全部执行完毕
             var flag = true; //表示都执行完毕了
             
+            
             for (var i in mul) {
                 attr = i == 'x' ? 'left' : i == 'y' ? 'top' : i == 'w' ? 'width' : i == 'h' ? 'height' : i == 'o' ? 'opacity' : i != undefined ? i : 'left';
                 target = mul[i];
                     
-        
+
                 if (type == 'buffer') {
-                    step = attr == 'opacity' ? (target - parseFloat(getStyle(element, attr)) * 100) / speed : (target - parseInt(getStyle(element, attr))) / speed;
+                    step = attr == 'opacity' ? (target - parseFloat(getStyle(element, attr)) * 100) / speed :
+                                                         (target - parseInt(getStyle(element, attr))) / speed;
                     step = step > 0 ? Math.ceil(step) : Math.floor(step);
                 }
                 
