@@ -105,7 +105,7 @@ Base.prototype.getClass = function (className, parentNode) {
     }
     var all = node.getElementsByTagName('*');
     for (var i = 0; i < all.length; i ++) {
-        if (all[i].className == className) {
+        if ((new RegExp('(\\s|^)' +className +'(\\s|$)')).test(all[i].className)) {
             temps.push(all[i]);
         }
     }
@@ -150,6 +150,33 @@ Base.prototype.first = function () {
 //获取末个节点，并返回这个节点对象
 Base.prototype.last = function () {
     return this.elements[this.elements.length - 1];
+};
+
+//获取某组节点的数量
+Base.prototype.length = function () {
+    return this.elements.length;
+};
+
+//获取某一个节点的属性
+Base.prototype.attr = function (attr) {
+    return this.elements[0][attr];
+};
+
+//获取某一个节点在整个节点组中是第几个索引
+Base.prototype.index = function () {
+    var children = this.elements[0].parentNode.children;
+    for (var i = 0; i < children.length; i ++) {
+        if (this.elements[0] == children[i]) return i;
+    }
+};
+
+//设置某一个节点的透明度
+Base.prototype.opacity = function (num) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.opacity = num / 100;
+        this.elements[i].style.filter = 'alpha(opacity=' + num + ')';
+    }
+    return this;
 };
 
 //获取某一个节点，并且Base对象
@@ -225,6 +252,25 @@ Base.prototype.removeRule = function (num, index) {
     return this;
 }
 
+//设置表单字段元素
+Base.prototype.form = function (name) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i] = this.elements[i][name];
+    }
+    return this;
+};
+
+//设置表单字段内容获取
+Base.prototype.value = function (str) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 0) {
+            return this.elements[i].value;
+        }
+        this.elements[i].value = str;
+    }
+    return this;
+}
+
 //设置innerHTML
 Base.prototype.html = function (str) {
     for (var i = 0; i < this.elements.length; i ++) {
@@ -235,6 +281,25 @@ Base.prototype.html = function (str) {
     }
     return this;
 }
+
+//设置innerText
+Base.prototype.text = function (str) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 0) {
+            return getInnerText(this.elements[i]);
+        }
+        setInnerText(this.elements[i], text);
+    }
+    return this;
+}
+
+//设置事件发生器
+Base.prototype.bind = function (event, fn) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        addEvent(this.elements[i], event, fn);
+    }
+    return this;
+};
 
 //设置鼠标移入移出方法
 Base.prototype.hover = function (over, out) {
@@ -276,8 +341,8 @@ Base.prototype.hide = function () {
 
 //设置物体居中
 Base.prototype.center = function (width, height) {
-    var top = (getInner().height - 250) / 2;
-    var left = (getInner().width - 350) / 2;
+    var top = (getInner().height - height) / 2;
+    var left = (getInner().width - width) / 2;
     for (var i = 0; i < this.elements.length; i ++) {
         this.elements[i].style.top = top + 'px';
         this.elements[i].style.left = left + 'px';

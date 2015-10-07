@@ -498,6 +498,35 @@ Base.prototype.prev = function(){
     return this;
 }
 
+//透明度
+Base.prototype.opacity = function(num){
+    for (var i = 0; i < this.elements.length; i++) {
+        this.elements[i].style.opacity = num / 100;
+        this.elements[i].style.filter = 'alpha(opacity=' + num + ')';
+    };
+    return this;
+}
+
+Base.prototype.length = function(){
+    return this.elements.length;
+}
+
+//获取某一个节点在整个节点组中是第几个索引
+Base.prototype.index = function(){
+    var children = this.elements[0].parentNode.children;
+    for (var i = 0; i < children.length; i++) {
+        if (this.elements[0] == children[i]){
+            return i;
+        }
+    };
+
+}
+
+//获取某一个节点色属性
+Base.prototype.attr = function(attr){
+    return this.elements[0][attr];
+}
+
 
 
 //插件入口

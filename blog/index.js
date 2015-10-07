@@ -136,10 +136,84 @@ $(function () {
         });
     });
 
+    //轮播器初始化
+    $('#banner img').opacity(0);
+    $('#banner img').eq(0).opacity(100);
+    $('#banner ul li').eq(0).css('color','#333');
+    $('#banner strong').html($('#banner img').eq(0).attr('alt'));
+
+
+    //轮播器计数器
+    var banner_index = 1;
+
+    //轮播器的种类,1表示透明度，2表示上下滚动
+    var banner_type = 1;
+
+    //自动轮播器
+    var banner_timer = setInterval(banner_fn,3000);
+
+
+    //手动播放器
+    $('#banner ul li').hover(function(){
+        clearInterval(banner_timer);
+        if ($(this).css('color') != 'rgb(51,51,51)' && $(this).css('color') != '#333') {
+            banner(this,banner_index == 0 ? $('#banner ul li').length() - 1 : banner_index - 1);
+        };
+    },function(){
+        banner_index = $(this).index() + 1;
+        banner_timer = setInterval(banner_fn,3000);
+    })
+
+
+    function banner_fn(){
+
+        if (banner_index >= $('#banner ul li').length()) {
+            banner_index = 0;
+        };
+
+        banner($('#banner ul li').eq(banner_index).first(),banner_index == 0 ? $('#banner ul li').length() - 1 : banner_index - 1);
+        banner_index++;
+
+    }
+
+    function banner(obj,prev){
+        console.log(obj);
+        $('#banner ul li').css('color','#999');
+        $(obj).css('color','#333');
+        $('#banner strong').html($('#banner img').eq($(obj).index()).attr('alt'));
+
+        if (banner_type == 1) {
+            $('#banner img').eq(prev).css('zIndex',1).animate({
+                attr : 'o',
+                target : 0,
+                t : 30,
+                step : 10
+            });
+
+            $('#banner img').eq($(obj).index()).css('zIndex',2).animate({
+                attr : 'o',
+                target : 100,
+                t : 30,
+                step : 10
+            })
+        } else if (banner_type == 2) {
+            $('#banner img').eq(prev).css('zIndex',1).opacity(100).animate({
+                attr : 'y',
+                target : 150,
+                t : 30,
+                step : 10
+            });
+            $('#banner img').eq($(obj).index()).css('top','-150px').css('zIndex',2).opacity(100).animate({
+                attr : 'y',
+                target : 0,
+                t : 30,
+                step : 10
+            })
+        };
 
 
 
-
+    }
 
 
 
