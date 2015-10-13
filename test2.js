@@ -1,666 +1,546 @@
 
 
-$(function () {
+//前台调用
+var $ = function (args) {
+    return new Base(args);
+}
 
-    //个人中心
-    $('#header .member').hover(function () {
-        $(this).css('background', 'url(images/arrow2.png) no-repeat 55px center');
-        $('#header .member_ul').show().animate({
-            t : 30,
-            step : 10,
-            mul : {
-                o : 100,
-                h : 120
-            }
-        });
-    }, function () {
-        $(this).css('background', 'url(images/arrow.png) no-repeat 55px center');
-        $('#header .member_ul').animate({
-            t : 30,
-            step : 10,
-            mul : {
-                o : 0,
-                h : 0
-            },
-            fn : function () {
-                $('#header .member_ul').hide();
-            }
-        });
-    });
+//基础库
+function Base(args) {
+    //创建一个数组，来保存获取的节点和节点数组
+    this.elements = [];
     
-    
-    //遮罩画布
-    var screen = $('#screen');
-    
-    //登录框
-    var login = $('#login');
-    login.center(350, 250).resize(function () {
-        if (login.css('display') == 'block') {
-            screen.lock();
-        }
-    });
-    $('#header .login').click(function () {
-        login.center(350, 250).css('display', 'block');
-        screen.lock().animate({
-            attr : 'o',
-            target : 30,
-            t : 30,
-            step : 10
-        });
-    });
-    $('#login .close').click(function () {
-        login.css('display', 'none');
-        //先执行渐变动画，动画完毕后再执行关闭unlock
-        screen.animate({
-            attr : 'o',
-            target : 0,
-            t : 30,
-            step : 10,
-            fn : function () {
-                screen.unlock();
-            }
-        });
-    });
-    
-    //注册框
-    var reg = $('#reg');
-    reg.center(600, 550).resize(function () {
-        if (reg.css('display') == 'block') {
-            screen.lock();
-        }
-    });
-    $('#header .reg').click(function () {
-        reg.center(600, 550).css('display', 'block');
-        screen.lock().animate({
-            attr : 'o',
-            target : 30,
-            t : 30,
-            step : 10
-        });
-    });
-    $('#reg .close').click(function () {
-        reg.css('display', 'none');
-        screen.animate({
-            attr : 'o',
-            target : 0,
-            t : 30,
-            step : 10,
-            fn : function () {
-                screen.unlock();
-            }
-        });
-    });
-    
-    //拖拽
-    login.drag($('#login h2').last());
-    reg.drag($('#reg h2').last());
-    
-    //百度分享初始化位置
-    $('#share').css('top', getScroll().top + (getInner().height - parseInt(getStyle($('#share').first(), 'height'))) / 2 + 'px');
-    
-    /*
-    addEvent(window, 'scroll', function () {
-        $('#share').animate({
-            attr : 'y',
-            target : getScroll().top + (getInner().height - parseInt(getStyle($('#share').first(), 'height'))) / 2
-        });
-    });
-    */
-    
-    $(window).bind('scroll', function () {
-        $('#share').animate({
-            attr : 'y',
-            target : getScroll().top + (getInner().height - parseInt(getStyle($('#share').first(), 'height'))) / 2
-        });
-    });
-    
-    //百度分享收缩效果
-    $('#share').hover(function () {
-        $(this).animate({
-            attr : 'x',
-            target : 0
-        });
-    }, function () {
-        $(this).animate({
-            attr : 'x',
-            target : -211
-        });
-    });
-    
-    //滑动导航
-    $('#nav .about li').hover(function () {
-        var target = $(this).first().offsetLeft;
-        $('#nav .nav_bg').animate({
-            attr : 'x',
-            target : target + 20,
-            t : 30,
-            step : 10,
-            fn : function () {
-                $('#nav .white').animate({
-                    attr : 'x',
-                    target : -target
-                });
-            }
-        });
-    }, function () {
-        $('#nav .nav_bg').animate({
-            attr : 'x',
-            target : 20,
-            t : 30,
-            step : 10,
-            fn : function () {
-                $('#nav .white').animate({
-                    attr : 'x',
-                    target : 0
-                });
-            }
-        });
-    });
-    
-    //左侧菜单
-    $('#sidebar h2').toggle(function () {
-        $(this).next().animate({
-            mul : {
-                h : 0,
-                o : 0
-            }
-        });
-    }, function () {
-        $(this).next().animate({
-            mul : {
-                h : 150,
-                o : 100
-            }
-        });
-    });
-
-    
-    //表单验证
-    
-    //初始化表单操作
-    $('form').first().reset();
-    
-    //focus, blur
-    //alert($('form').first().user.value);
-    //$('form').form('user').value('bbb');
-    
-    $('form').form('user').bind('focus', function () {
-        $('#reg .info_user').css('display', 'block');
-        $('#reg .error_user').css('display', 'none');
-        $('#reg .succ_user').css('display', 'none');
-    }).bind('blur', function () {
-        if (trim($(this).value()) == '') {
-            $('#reg .info_user').css('display', 'none');
-            $('#reg .error_user').css('display', 'none');
-            $('#reg .succ_user').css('display', 'none');
-        } else if (!check_user()) {
-            $('#reg .error_user').css('display', 'block');
-            $('#reg .info_user').css('display', 'none');
-            $('#reg .succ_user').css('display', 'none');
-        } else {
-            $('#reg .succ_user').css('display', 'block');
-            $('#reg .error_user').css('display', 'none');
-            $('#reg .info_user').css('display', 'none');
-        }
-    });
-    
-    function check_user() {
-        if (/[\w]{2,20}/.test(trim($('form').form('user').value()))) return true;
-    }
-    
-    
-    //密码验证
-    $('form').form('pass').bind('focus', function () {
-        $('#reg .info_pass').css('display', 'block');
-        $('#reg .error_pass').css('display', 'none');
-        $('#reg .succ_pass').css('display', 'none');
-    }).bind('blur', function () {
-        if (trim($(this).value()) == '') {
-            $('#reg .info_pass').css('display', 'none');
-        } else {
-            if (check_pass()) {
-                $('#reg .info_pass').css('display', 'none');
-                $('#reg .error_pass').css('display', 'none');
-                $('#reg .succ_pass').css('display', 'block');
-            } else {
-                $('#reg .info_pass').css('display', 'none');
-                $('#reg .error_pass').css('display', 'block');
-                $('#reg .succ_pass').css('display', 'none');
-            }
-        }
-    });
-    
-    //密码强度验证
-    $('form').form('pass').bind('keyup', function () {
-        check_pass();
-    });
-    
-    //密码验证函数
-    function check_pass() {
-        var value = trim($('form').form('pass').value());
-        var value_length = value.length;
-        var code_length = 0;
-        
-        //第一个必须条件的验证6-20位之间
-        if (value_length >= 6 && value_length <= 20) {
-            $('#reg .info_pass .q1').html('●').css('color', 'green');
-        } else {
-            $('#reg .info_pass .q1').html('○').css('color', '#666');
-        }
-        
-        //第二个必须条件的验证，字母或数字或非空字符，任意一个即可
-        if (value_length > 0 && !/\s/.test(value)) {
-            $('#reg .info_pass .q2').html('●').css('color', 'green');
-        } else {
-            $('#reg .info_pass .q2').html('○').css('color', '#666');
-        }
-        
-        //第三个必须条件的验证，大写字母，小写字母，数字，非空字符 任意两种混拼即可
-        if (/[\d]/.test(value)) {
-            code_length++;
-        }
-        
-        if (/[a-z]/.test(value)) {
-            code_length++;
-        }
-        
-        if (/[A-Z]/.test(value)) {
-            code_length++;
-        }
-        
-        if (/[^\w]/.test(value)) {
-            code_length++;
-        }
-        
-        if (code_length >= 2) {
-            $('#reg .info_pass .q3').html('●').css('color', 'green');
-        } else {
-            $('#reg .info_pass .q3').html('○').css('color', '#666');
-        }
-        
-        //安全级别
-        if (value_length >= 10 && code_length >= 3) {
-            $('#reg .info_pass .s1').css('color', 'green');
-            $('#reg .info_pass .s2').css('color', 'green');
-            $('#reg .info_pass .s3').css('color', 'green');
-            $('#reg .info_pass .s4').html('高').css('color', 'green');
-        } else if (value_length >= 8 && code_length >= 2) {
-            $('#reg .info_pass .s1').css('color', '#f60');
-            $('#reg .info_pass .s2').css('color', '#f60');
-            $('#reg .info_pass .s3').css('color', '#ccc');
-            $('#reg .info_pass .s4').html('中').css('color', '#f60');
-        } else if (value_length >= 1) {
-            $('#reg .info_pass .s1').css('color', 'maroon');
-            $('#reg .info_pass .s2').css('color', '#ccc');
-            $('#reg .info_pass .s3').css('color', '#ccc');
-            $('#reg .info_pass .s4').html('低').css('color', 'maroon');
-        } else {
-            $('#reg .info_pass .s1').css('color', '#ccc');
-            $('#reg .info_pass .s2').css('color', '#ccc');
-            $('#reg .info_pass .s3').css('color', '#ccc');
-            $('#reg .info_pass .s4').html(' ');
-        }   
-        
-        if (value_length >= 6 && value_length <= 20 && !/\s/.test(value) && code_length >= 2) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    
-    //密码确认
-    $('form').form('notpass').bind('focus', function () {
-        $('#reg .info_notpass').css('display', 'block');
-        $('#reg .error_notpass').css('display', 'none');
-        $('#reg .succ_notpass').css('display', 'none');
-    }).bind('blur', function () {
-        if (trim($(this).value()) == '') {
-            $('#reg .info_notpass').css('display', 'none');
-        } else if (check_notpass()){
-            $('#reg .info_notpass').css('display', 'none');
-            $('#reg .error_notpass').css('display', 'none');
-            $('#reg .succ_notpass').css('display', 'block');
-        } else {
-            $('#reg .info_notpass').css('display', 'none');
-            $('#reg .error_notpass').css('display', 'block');
-            $('#reg .succ_notpass').css('display', 'none');
-        }
-    });
-    
-    function check_notpass() {
-        if (trim($('form').form('notpass').value()) == trim($('form').form('pass').value())) return true;
-    }
-    
-    //提问
-    $('form').form('ques').bind('change', function () {
-        if (check_ques()) $('#reg .error_ques').css('display', 'none');
-    });
-    
-    function check_ques() {
-        if ($('form').form('ques').value() != 0) return true;
-    }
-    
-    //回答
-    $('form').form('ans').bind('focus', function () {
-        $('#reg .info_ans').css('display', 'block');
-        $('#reg .error_ans').css('display', 'none');
-        $('#reg .succ_ans').css('display', 'none');
-    }).bind('blur', function () {
-        if (trim($(this).value()) == '') {
-            $('#reg .info_ans').css('display', 'none');
-        } else if (check_ans()) {
-            $('#reg .info_ans').css('display', 'none');
-            $('#reg .error_ans').css('display', 'none');
-            $('#reg .succ_ans').css('display', 'block');
-        } else {
-            $('#reg .info_ans').css('display', 'none');
-            $('#reg .error_ans').css('display', 'block');
-            $('#reg .succ_ans').css('display', 'none');
-        }
-    });
-    
-    function check_ans() {
-        if (trim($('form').form('ans').value()).length >= 2 && trim($('form').form('ans').value()).length <= 32) return true;
-    }
-    
-    //电子邮件
-    $('form').form('email').bind('focus', function () {
-    
-        //补全界面
-        if ($(this).value().indexOf('@') == -1) $('#reg .all_email').css('display', 'block');
-    
-        $('#reg .info_email').css('display', 'block');
-        $('#reg .error_email').css('display', 'none');
-        $('#reg .succ_email').css('display', 'none');
-    }).bind('blur', function () {
-    
-        //补全界面
-        $('#reg .all_email').css('display', 'none');
-    
-        if (trim($(this).value()) == '') {
-            $('#reg .info_email').css('display', 'none');
-        } else if (check_email()) {
-            $('#reg .info_email').css('display', 'none');
-            $('#reg .error_email').css('display', 'none');
-            $('#reg .succ_email').css('display', 'block');
-        } else {
-            $('#reg .info_email').css('display', 'none');
-            $('#reg .error_email').css('display', 'block');
-            $('#reg .succ_email').css('display', 'none');
-        }
-    });
-    
-    function check_email() {
-        if (/^[\w\-\.]+@[\w\-]+(\.[a-zA-Z]{2,4}){1,2}$/.test(trim($('form').form('email').value()))) return true;
-    }
-    
-    
-    //电子邮件补全系统键入
-    $('form').form('email').bind('keyup', function (event) {
-        if ($(this).value().indexOf('@') == -1) {
-            $('#reg .all_email').css('display', 'block');
-            $('#reg .all_email li span').html($(this).value());
-        } else {
-            $('#reg .all_email').css('display', 'none');
-        }
-        
-        $('#reg .all_email li').css('background', 'none');
-        $('#reg .all_email li').css('color', '#666');
-        
-        if (event.keyCode == 40) {
-            if (this.index == undefined || this.index >= $('#reg .all_email li').length() - 1) {
-                this.index = 0;
-            } else {
-                this.index++;
-            }
-            $('#reg .all_email li').eq(this.index).css('background', '#e5edf2');
-            $('#reg .all_email li').eq(this.index).css('color', '#369');
-        }
-        
-        if (event.keyCode == 38) {
-            if (this.index == undefined || this.index <= 0) {
-                this.index = $('#reg .all_email li').length() - 1;
-            } else {
-                this.index--;
-            }
-            $('#reg .all_email li').eq(this.index).css('background', '#e5edf2');
-            $('#reg .all_email li').eq(this.index).css('color', '#369');
-        }
-        
-        
-        if (event.keyCode == 13) {
-            $(this).value($('#reg .all_email li').eq(this.index).text());
-            $('#reg .all_email').css('display', 'none');
-            this.index = undefined;
-        }
-        
-    });
-    
-    //电子邮件补全系统点击获取
-    $('#reg .all_email li').bind('mousedown', function () {
-        $('form').form('email').value($(this).text());
-    });
-    
-    //电子邮件补全系统鼠标移入移出效果
-    $('#reg .all_email li').hover(function () {
-        $(this).css('background', '#e5edf2');
-        $(this).css('color', '#369');
-    }, function () {
-        $(this).css('background', 'none');
-        $(this).css('color', '#666');
-    });
-    
-    
-    //年月日
-    var year = $('form').form('year');
-    var month = $('form').form('month');
-    var day = $('form').form('day');
-    
-    var day30 = [4, 6, 9, 11];
-    var day31 = [1, 3, 5, 7, 8, 10, 12];
-    
-    //注入年
-    for (var i = 1950; i <= 2013; i ++) {
-        year.first().add(new Option(i, i), undefined);
-    }
-    
-    //注入月
-    for (var i = 1; i <= 12; i ++) {
-        month.first().add(new Option(i, i), undefined);
-    }
-    
-    
-    year.bind('change', select_day);
-    month.bind('change', select_day);
-    day.bind('change', function () {
-        if (check_birthday()) $('#reg .error_birthday').css('display', 'none');
-    });
-    
-    function check_birthday() {
-        if (year.value() != 0 && month.value() != 0 && day.value() != 0) return true;
-    }
-    
-    function select_day() {
-        if (year.value() != 0 && month.value() != 0) {
-            
-            //清理之前的注入
-            day.first().options.length = 1;
-            
-            //不确定的日
-            var cur_day = 0;
-            
-            //注入日
-            if (inArray(day31, parseInt(month.value()))) {
-                cur_day = 31;
-            } else if (inArray(day30, parseInt(month.value()))) {
-                cur_day = 30;
-            } else {
-                if ((parseInt(year.value()) % 4 == 0 && parseInt(year.value()) % 100 != 0) || parseInt(year.value()) % 400 == 0) {
-                    cur_day = 29;
-                } else {
-                    cur_day = 28;
+    if (typeof args == 'string') {
+        //css模拟
+        if (args.indexOf(' ') != -1) {
+            var elements = args.split(' ');         //把节点拆开分别保存到数组里
+            var childElements = [];                 //存放临时节点对象的数组，解决被覆盖的问题
+            var node = [];                              //用来存放父节点用的
+            for (var i = 0; i < elements.length; i ++) {
+                if (node.length == 0) node.push(document);      //如果默认没有父节点，就把document放入
+                switch (elements[i].charAt(0)) {
+                    case '#' :
+                        childElements = [];             //清理掉临时节点，以便父节点失效，子节点有效
+                        childElements.push(this.getId(elements[i].substring(1)));
+                        node = childElements;       //保存父节点，因为childElements要清理，所以需要创建node数组
+                        break;
+                    case '.' : 
+                        childElements = [];
+                        for (var j = 0; j < node.length; j ++) {
+                            var temps = this.getClass(elements[i].substring(1), node[j]);
+                            for (var k = 0; k < temps.length; k ++) {
+                                childElements.push(temps[k]);
+                            }
+                        }
+                        node = childElements;
+                        break;
+                    default : 
+                        childElements = [];
+                        for (var j = 0; j < node.length; j ++) {
+                            var temps = this.getTagName(elements[i], node[j]);
+                            for (var k = 0; k < temps.length; k ++) {
+                                childElements.push(temps[k]);
+                            }
+                        }
+                        node = childElements;
                 }
             }
+            this.elements = childElements;
+        } else {
+            //find模拟
+            switch (args.charAt(0)) {
+                case '#' :
+                    this.elements.push(this.getId(args.substring(1)));
+                    break;
+                case '.' : 
+                    this.elements = this.getClass(args.substring(1));
+                    break;
+                default : 
+                    this.elements = this.getTagName(args);
+            }
+        }
+    } else if (typeof args == 'object') {
+        if (args != undefined) {    //_this是一个对象，undefined也是一个对象，区别与typeof返回的带单引号的'undefined'
+            this.elements[0] = args;
+        }
+    } else if (typeof args == 'function') {
+        this.ready(args);
+    }
+}
+
+//addDomLoaded
+Base.prototype.ready = function (fn) {
+    addDomLoaded(fn);
+};
+
+//获取ID节点
+Base.prototype.getId = function (id) {
+    return document.getElementById(id)
+};
+
+//获取元素节点数组
+Base.prototype.getTagName = function (tag, parentNode) {
+    var node = null;
+    var temps = [];
+    if (parentNode != undefined) {
+        node = parentNode;
+    } else {
+        node = document;
+    }
+    var tags = node.getElementsByTagName(tag);
+    for (var i = 0; i < tags.length; i ++) {
+        temps.push(tags[i]);
+    }
+    return temps;
+};
+
+//获取CLASS节点数组
+Base.prototype.getClass = function (className, parentNode) {
+    var node = null;
+    var temps = [];
+    if (parentNode != undefined) {
+        node = parentNode;
+    } else {
+        node = document;
+    }
+    var all = node.getElementsByTagName('*');
+    for (var i = 0; i < all.length; i ++) {
+        if ((new RegExp('(\\s|^)' +className +'(\\s|$)')).test(all[i].className)) {
+            temps.push(all[i]);
+        }
+    }
+    return temps;
+}
+
+//设置CSS选择器子节点
+Base.prototype.find = function (str) {
+    var childElements = [];
+    for (var i = 0; i < this.elements.length; i ++) {
+        switch (str.charAt(0)) {
+            case '#' :
+                childElements.push(this.getId(str.substring(1)));
+                break;
+            case '.' : 
+                var temps = this.getClass(str.substring(1), this.elements[i]);
+                for (var j = 0; j < temps.length; j ++) {
+                    childElements.push(temps[j]);
+                }
+                break;
+            default : 
+                var temps = this.getTagName(str, this.elements[i]);
+                for (var j = 0; j < temps.length; j ++) {
+                    childElements.push(temps[j]);
+                }
+        }
+    }
+    this.elements = childElements;
+    return this;
+}
+
+//获取某一个节点，并返回这个节点对象
+Base.prototype.ge = function (num) {    
+    return this.elements[num];
+};
+
+//获取首个节点，并返回这个节点对象
+Base.prototype.first = function () {
+    return this.elements[0];
+};
+
+//获取末个节点，并返回这个节点对象
+Base.prototype.last = function () {
+    return this.elements[this.elements.length - 1];
+};
+
+//获取某组节点的数量
+Base.prototype.length = function () {
+    return this.elements.length;
+};
+
+//获取某一个节点的属性
+Base.prototype.attr = function (attr, value) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 1) {
+            return this.elements[i].getAttribute(attr);
+        } else if (arguments.length == 2) {
+            this.elements[i].setAttribute(attr, value);
+        }
+    }
+    return this;
+};
+
+//获取某一个节点在整个节点组中是第几个索引
+Base.prototype.index = function () {
+    var children = this.elements[0].parentNode.children;
+    for (var i = 0; i < children.length; i ++) {
+        if (this.elements[0] == children[i]) return i;
+    }
+};
+
+//设置某一个节点的透明度
+Base.prototype.opacity = function (num) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.opacity = num / 100;
+        this.elements[i].style.filter = 'alpha(opacity=' + num + ')';
+    }
+    return this;
+};
+
+//获取某一个节点，并且Base对象
+Base.prototype.eq = function (num) {
+    var element = this.elements[num];
+    this.elements = [];
+    this.elements[0] = element;
+    return this;
+};
+
+//获取当前节点的下一个元素节点
+Base.prototype.next = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i] = this.elements[i].nextSibling;
+        if (this.elements[i] == null) throw new Error('找不到下一个同级元素节点！');
+        if (this.elements[i].nodeType == 3) this.next();
+    }
+    return this;
+};
+
+//获取当前节点的上一个元素节点
+Base.prototype.prev = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i] = this.elements[i].previousSibling;
+        if (this.elements[i] == null) throw new Error('找不到上一个同级元素节点！');
+        if (this.elements[i].nodeType == 3) this.prev();
+    }
+    return this;
+};
+
+//设置CSS
+Base.prototype.css = function (attr, value) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 1) {
+            return getStyle(this.elements[i], attr);
+        }
+        this.elements[i].style[attr] = value;
+    }
+    return this;
+}
+
+//添加Class
+Base.prototype.addClass = function (className) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (!hasClass(this.elements[i], className)) {
+            this.elements[i].className += ' ' + className;
+        }
+    }
+    return this;
+}
+
+//移除Class
+Base.prototype.removeClass = function (className) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (hasClass(this.elements[i], className)) {
+            this.elements[i].className = this.elements[i].className.replace(new RegExp('(\\s|^)' +className +'(\\s|$)'), ' ');
+        }
+    }
+    return this;
+}
+
+//添加link或style的CSS规则
+Base.prototype.addRule = function (num, selectorText, cssText, position) {
+    var sheet = document.styleSheets[num];
+    insertRule(sheet, selectorText, cssText, position);
+    return this;
+}
+
+//移除link或style的CSS规则
+Base.prototype.removeRule = function (num, index) {
+    var sheet = document.styleSheets[num];
+    deleteRule(sheet, index);
+    return this;
+}
+
+//设置表单字段元素
+Base.prototype.form = function (name) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i] = this.elements[i][name];
+    }
+    return this;
+};
+
+//设置表单字段内容获取
+Base.prototype.value = function (str) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 0) {
+            return this.elements[i].value;
+        }
+        this.elements[i].value = str;
+    }
+    return this;
+}
+
+//设置innerHTML
+Base.prototype.html = function (str) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 0) {
+            return this.elements[i].innerHTML;
+        }
+        this.elements[i].innerHTML = str;
+    }
+    return this;
+}
+
+//设置innerText
+Base.prototype.text = function (str) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        if (arguments.length == 0) {
+            return getInnerText(this.elements[i]);
+        }
+        setInnerText(this.elements[i], text);
+    }
+    return this;
+}
+
+//设置事件发生器
+Base.prototype.bind = function (event, fn) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        addEvent(this.elements[i], event, fn);
+    }
+    return this;
+};
+
+//设置鼠标移入移出方法
+Base.prototype.hover = function (over, out) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        addEvent(this.elements[i], 'mouseover', over);
+        addEvent(this.elements[i], 'mouseout', out);
+    }
+    return this;
+};
+
+//设置点击切换方法
+Base.prototype.toggle = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        (function (element, args) {
+            var count = 0;
+            addEvent(element, 'click', function () {
+                args[count++ % args.length].call(this);
+            });
+        })(this.elements[i], arguments);
+    }
+    return this;
+};
+
+//设置显示
+Base.prototype.show = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.display = 'block';
+    }
+    return this;
+};
+
+//设置隐藏
+Base.prototype.hide = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.display = 'none';
+    }
+    return this;
+};
+
+//设置物体居中
+Base.prototype.center = function (width, height) {
+    var top = (getInner().height - height) / 2;
+    var left = (getInner().width - width) / 2;
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.top = top + 'px';
+        this.elements[i].style.left = left + 'px';
+    }
+    return this;
+};
+
+//锁屏功能
+Base.prototype.lock = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.width = getInner().width + 'px';
+        this.elements[i].style.height = getInner().height + 'px';
+        this.elements[i].style.display = 'block';
+        document.documentElement.style.overflow = 'hidden';
+        addEvent(window, 'scroll', scrollTop);
+    }
+    return this;
+};
+
+Base.prototype.unlock = function () {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].style.display = 'none';
+        document.documentElement.style.overflow = 'auto';
+        removeEvent(window, 'scroll', scrollTop);
+    }
+    return this;
+};
+
+//触发点击事件
+Base.prototype.click = function (fn) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        this.elements[i].onclick = fn;
+    }
+    return this;
+};
+
+//触发浏览器窗口事件
+Base.prototype.resize = function (fn) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        var element = this.elements[i];
+        addEvent(window, 'resize', function () {
+            fn();
+            if (element.offsetLeft > getInner().width - element.offsetWidth) {
+                element.style.left = getInner().width - element.offsetWidth + 'px';
+            }
+            if (element.offsetTop > getInner().height - element.offsetHeight) {
+                element.style.top = getInner().height - element.offsetHeight + 'px';
+            }
+        });
+    }
+    return this;
+};
+
+//设置动画
+Base.prototype.animate = function (obj) {
+    for (var i = 0; i < this.elements.length; i ++) {
+        var element = this.elements[i];
+        var attr = obj['attr'] == 'x' ? 'left' : obj['attr'] == 'y' ? 'top' : 
+                       obj['attr'] == 'w' ? 'width' : obj['attr'] == 'h' ? 'height' : 
+                       obj['attr'] == 'o' ? 'opacity' : obj['attr'] != undefined ? obj['attr'] : 'left';
+
+        
+        var start = obj['start'] != undefined ? obj['start'] : 
+                        attr == 'opacity' ? parseFloat(getStyle(element, attr)) * 100 : 
+                                                   parseInt(getStyle(element, attr));
+        
+        var t = obj['t'] != undefined ? obj['t'] : 10;                                              //可选，默认10毫秒执行一次
+        var step = obj['step'] != undefined ? obj['step'] : 20;                             //可选，每次运行10像素
+        
+        var alter = obj['alter'];
+        var target = obj['target'];
+        var mul = obj['mul'];
+        
+        var speed = obj['speed'] != undefined ? obj['speed'] : 6;                           //可选，默认缓冲速度为6
+        var type = obj['type'] == 0 ? 'constant' : obj['type'] == 1 ? 'buffer' : 'buffer';      //可选，0表示匀速，1表示缓冲，默认缓冲
+        
+        
+        if (alter != undefined && target == undefined) {
+            target = alter + start;
+        } else if (alter == undefined && target == undefined && mul == undefined) {
+            throw new Error('alter增量或target目标量必须传一个！');
+        }
+        
+        
+        
+        if (start > target) step = -step;
+        
+        if (attr == 'opacity') {
+            element.style.opacity = parseInt(start) / 100;
+            element.style.filter = 'alpha(opacity=' + parseInt(start) +')';
+        } else {
+            //element.style[attr] = start + 'px';
+        }
+        
+        
+        if (mul == undefined) {
+            mul = {};
+            mul[attr] = target;
+        } 
+        
+
+        clearInterval(element.timer);
+        element.timer = setInterval(function () {
+        
+            /*
+                问题1：多个动画执行了多个列队动画，我们要求不管多少个动画只执行一个列队动画
+                问题2：多个动画数值差别太大，导致动画无法执行到目标值，原因是定时器提前清理掉了
+                
+                解决1：不管多少个动画，只提供一次列队动画的机会
+                解决2：多个动画按最后一个分动画执行完毕后再清理即可
+            */
             
-            for (var i = 1; i <= cur_day; i ++) {
-                day.first().add(new Option(i, i), undefined);
+            //创建一个布尔值，这个值可以了解多个动画是否全部执行完毕
+            var flag = true; //表示都执行完毕了
+            
+            
+            for (var i in mul) {
+                attr = i == 'x' ? 'left' : i == 'y' ? 'top' : i == 'w' ? 'width' : i == 'h' ? 'height' : i == 'o' ? 'opacity' : i != undefined ? i : 'left';
+                target = mul[i];
+                    
+
+                if (type == 'buffer') {
+                    step = attr == 'opacity' ? (target - parseFloat(getStyle(element, attr)) * 100) / speed :
+                                                         (target - parseInt(getStyle(element, attr))) / speed;
+                    step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                }
+                
+                
+                
+                if (attr == 'opacity') {
+                    if (step == 0) {
+                        setOpacity();
+                    } else if (step > 0 && Math.abs(parseFloat(getStyle(element, attr)) * 100 - target) <= step) {
+                        setOpacity();
+                    } else if (step < 0 && (parseFloat(getStyle(element, attr)) * 100 - target) <= Math.abs(step)) {
+                        setOpacity();
+                    } else {
+                        var temp = parseFloat(getStyle(element, attr)) * 100;
+                        element.style.opacity = parseInt(temp + step) / 100;
+                        element.style.filter = 'alpha(opacity=' + parseInt(temp + step) + ')';
+                    }
+                    
+                    if (parseInt(target) != parseInt(parseFloat(getStyle(element, attr)) * 100)) flag = false;
+
+                } else {
+                    if (step == 0) {
+                        setTarget();
+                    } else if (step > 0 && Math.abs(parseInt(getStyle(element, attr)) - target) <= step) {
+                        setTarget();
+                    } else if (step < 0 && (parseInt(getStyle(element, attr)) - target) <= Math.abs(step)) {
+                        setTarget();
+                    } else {
+                        element.style[attr] = parseInt(getStyle(element, attr)) + step + 'px';
+                    }
+                    
+                    if (parseInt(target) != parseInt(getStyle(element, attr))) flag = false;
+                }
+                
+                //document.getElementById('test').innerHTML += i + '--' + parseInt(target) + '--' + parseInt(getStyle(element, attr)) + '--' + flag + '<br />';
+                
             }
             
-        } else {
-            //清理之前的注入
-            day.first().options.length = 1;
+            if (flag) {
+                clearInterval(element.timer);
+                if (obj.fn != undefined) obj.fn();
+            }
+                
+        }, t);
+        
+        function setTarget() {
+            element.style[attr] = target + 'px';
+        }
+        
+        function setOpacity() {
+            element.style.opacity = parseInt(target) / 100;
+            element.style.filter = 'alpha(opacity=' + parseInt(target) + ')';
         }
     }
+    return this;
+};
 
-    
-    //备注
-    $('form').form('ps').bind('keyup', check_ps).bind('paste', function () {
-        //粘贴事件会在内容粘贴到文本框之前触发
-        setTimeout(check_ps, 50);
-    });
-    
-    //清尾
-    $('#reg .ps .clear').click(function () {
-        $('form').form('ps').value($('form').form('ps').value().substring(0,200));
-        check_ps();
-    });
-    
-    function check_ps() {
-        var num = 200 - $('form').form('ps').value().length;
-        if (num >= 0) {
-            $('#reg .ps').eq(0).css('display', 'block');
-            $('#reg .ps .num').eq(0).html(num);
-            $('#reg .ps').eq(1).css('display', 'none');
-            return true;
-        } else {
-            $('#reg .ps').eq(0).css('display', 'none');
-            $('#reg .ps .num').eq(1).html(Math.abs(num)).css('color', 'red');
-            $('#reg .ps').eq(1).css('display', 'block');
-            return false;
-        }
-    }
-    
-    //提交
-    $('form').form('sub').click(function () {
-        var flag = true;
-    
-        if (!check_user()) {
-            $('#reg .error_user').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_pass()) {
-            $('#reg .error_pass').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_notpass()) {
-            $('#reg .error_notpass').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_ques()) {
-            $('#reg .error_ques').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_ans()) {
-            $('#reg .error_ans').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_email()) {
-            $('#reg .error_email').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_birthday()) {
-            $('#reg .error_birthday').css('display', 'block');
-            flag = false;
-        }
-        
-        if (!check_ps()) {
-            flag = false;
-        }
-    
-        if (flag) {
-            $('form').first().submit();
-        }
-    });
-    
-    
-    //轮播器初始化
-    //$('#banner img').css('display', 'none');
-    //$('#banner img').eq(0).css('display', 'block');
-    $('#banner img').opacity(0);
-    $('#banner img').eq(0).opacity(100);
-    $('#banner ul li').eq(0).css('color', '#333');
-    $('#banner strong').html($('#banner img').eq(0).attr('alt'));
-    
-    //轮播器计数器
-    var banner_index = 1;
-    
-    //轮播器的种类
-    var banner_type = 1;        //1表示透明度，2表示上下滚动
-    
-    //自动轮播器
-    var banner_timer = setInterval(banner_fn, 3000);
-    
-    //手动轮播器
-    $('#banner ul li').hover(function () {
-        clearInterval(banner_timer);
-        if ($(this).css('color') != 'rgb(51, 51, 51)' && $(this).css('color') != '#333') {
-            banner(this, banner_index == 0 ? $('#banner ul li').length() - 1 : banner_index - 1);
-        }
-    }, function () {
-        banner_index = $(this).index() + 1;
-        banner_timer = setInterval(banner_fn, 3000);
-    });
-    
-    function banner(obj, prev) {
-        $('#banner ul li').css('color', '#999');
-        $(obj).css('color', '#333');
-        $('#banner strong').html($('#banner img').eq($(obj).index()).attr('alt'));
-        
-        if (banner_type == 1) {
-            $('#banner img').eq(prev).animate({
-                attr : 'o',
-                target : 0,
-                t : 30,
-                step : 10
-            }).css('zIndex', 1);
-            $('#banner img').eq($(obj).index()).animate({
-                attr : 'o',
-                target : 100,
-                t : 30,
-                step : 10
-            }).css('zIndex', 2);
-        } else if (banner_type == 2) {
-            $('#banner img').eq(prev).animate({
-                attr : 'y',
-                target : 150,
-                t : 30,
-                step : 10
-            }).css('zIndex', 1).opacity(100);
-            $('#banner img').eq($(obj).index()).animate({
-                attr : 'y',
-                target : 0,
-                t : 30,
-                step : 10
-            }).css('top', '-150px').css('zIndex', 2).opacity(100);
-        }
-        
-    }
-    
-    function banner_fn() {
-        if (banner_index >= $('#banner ul li').length()) banner_index = 0;
-        banner($('#banner ul li').eq(banner_index).first(), banner_index == 0 ? $('#banner ul li').length() - 1 : banner_index - 1);
-        banner_index++;
-    }
-    
-    
-});
+//插件入口
+Base.prototype.extend = function (name, fn) {
+    Base.prototype[name] = fn;
+};
+
+
+
+
+
+
 
 
 

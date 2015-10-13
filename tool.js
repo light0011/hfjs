@@ -192,8 +192,6 @@ function getStyle(element,attr){
 }
 
 //跨浏览器获取滚动条位置
-
-
 function getScroll(){
     return {
         top : document.documentElement.scrollTop || document.body.scrollTop,
@@ -201,5 +199,26 @@ function getScroll(){
     }
 }
 
+
+//获取某一个元素到最外层顶点的位置
+function offsetTop(element) {
+    var top = element.offsetTop;
+    var parent = element.offsetParent;
+    while (parent != null) {
+        top += parent.offsetTop;
+        parent = parent.offsetParent;
+    }
+    return top;
+}
+
+function offsetTop(element){
+    var top = element.offsetTop;
+    var parent = element.offsetParent;
+    while(parent != null){
+        top += parent.offsetTop;
+        parent = parent.offsetParent;
+    }
+    return top;
+}
 
 

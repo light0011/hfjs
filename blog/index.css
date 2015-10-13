@@ -483,6 +483,26 @@ ul li {
 	color:#fff;
 	z-index:4;
 }
+#photo {
+	width:900px;
+	float:left;
+}
+#photo dl {
+	width:225px;
+	height:270px;
+	float:left;
+	margin:5px 0 15px 0;
+}
+#photo dl dt {
+	width:200px;
+	height:250px;
+	margin:0 auto;
+}
+#photo dl dd {
+	height:25px;
+	line-height:25px;
+	text-align:center;
+}
 #share {
 	width:210px;
 	height:315px;

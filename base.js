@@ -523,10 +523,25 @@ Base.prototype.index = function(){
 }
 
 //获取某一个节点色属性
-Base.prototype.attr = function(attr){
-    return this.elements[0][attr];
+Base.prototype.attr = function(attr,value){
+    for(var i = 0;i < this.elements.length;i ++){
+        if (arguments.length == 1) {
+            return this.elements[i].getAttribute(attr);
+        } else if (arguments.length == 2) {
+            this.elements[i].setAttribute(attr,value);
+        };
+    }
+    return this;
 }
 
+
+//绑定事件
+Base.prototype.bind = function(event,fn){
+    for(var i = 0; i < this.elements.length;i++){
+        addEvent(this.elements[i],event,fn);
+    }
+    return this;
+}
 
 
 //插件入口
