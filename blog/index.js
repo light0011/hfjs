@@ -1,7 +1,7 @@
 
 
 $(function () {
-    alert($('.son').first().offsetLeft);
+
     //个人中心
     $('#header .member').hover(function () {
         $(this).css('background', 'url(images/arrow2.png) no-repeat 55px center');
