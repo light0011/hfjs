@@ -163,6 +163,8 @@ $().extend(extendName,function(){
 })
 
 
+ajax的调用
 
+ajax(obj);
 
 
