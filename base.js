@@ -488,7 +488,7 @@ Base.prototype.next = function(){
 }
 
 
-//获取当前节点的下一个元素节点
+//获取当前节点的上一个元素节点
 Base.prototype.prev = function(){
     for (var i = 0; i < this.elements.length; i++) {
         this.elements[i] = this.elements[i].previousSibling;
@@ -507,6 +507,8 @@ Base.prototype.opacity = function(num){
     return this;
 }
 
+
+//获取的节点个数
 Base.prototype.length = function(){
     return this.elements.length;
 }
@@ -522,7 +524,7 @@ Base.prototype.index = function(){
 
 }
 
-//获取某一个节点色属性
+//获取某一个节点的属性
 Base.prototype.attr = function(attr,value){
     for(var i = 0;i < this.elements.length;i ++){
         if (arguments.length == 1) {
